@@ -1,0 +1,268 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1')
+    title Full Stack JavaScript
+
+    link(rel='stylesheet', type='text/css', href='build/build.css')
+
+  body
+
+    article
+
+      section
+        h1 Full Stack JavaScript
+
+      section
+        h2 Kevin Isom 
+        h3.bullet Who is this guy?
+        ul
+          li Lead Web Engineer at InSpark Technology
+          li Co-Organiser for Auckland Node.js
+          li Co-Organiser for Auckland JavaScript
+          li General committee member for the JavaScript Society of New Zealand
+          li I really like JavaScript
+          
+      section.emphatic-text(data-bespoke-backdrop='emphatic')
+        img(src="images/warning.gif")
+      
+      section
+        h2 New Project
+      section
+        img(src="images/bugs-heart.gif")
+      section
+        h2 What do I use?
+      
+      section
+        h3 .Net ?
+      
+      section
+        img(src="images/minions-lol.gif")
+
+      section
+        h3 Seriously
+        h2 .Net is a wasteland
+        
+      section
+        h3 Something on the JVM?
+      
+      section
+        img(src="images/disgusting.gif")
+          
+      section
+        h3 PHP?
+
+      section
+        img(src="images/maybe.gif")
+
+      section
+        h3 Node JS?
+
+      section
+        img(src="images/shocked-not-shocked.gif")
+
+      section
+        h3 Why?
+        ul
+          li Easier context switching
+          li Dynamic Language, no left had right hand code
+          li I know JavaScript
+          li Lot's of other Developers know JavaScript
+
+      section
+        h2 Decisions
+
+      section
+        img(src="images/sad-snoopy.gif")
+      
+      section
+        h2 Seriously, making a decision is not a bad thing
+
+      section
+        h2.bullet  Web Frameworks
+        ul
+          li Express
+          li Hapi.js
+          li Restify
+          li Numerous Frameworks built on Express
+      section
+        h2 DataBase?
+      section
+        h2 Data Access Code
+      section
+        h3.bullet  Knex.js for
+        ul
+          li Database migrations
+          li Data seeding
+          li Direct querying
+      section
+        pre
+          code.language-javascript.
+            exports.up = function(knex, Promise) {
+              return knex.schema
+                .createTable('users', (t) => {
+                  t.increments('id').primary();
+                  t.string('email').notNullable();
+                  t.string('firstName').notNullable();
+                  t.string('lastName').notNullable();
+                  t.string('password').notNullable();
+                  t.timestamps(true);
+                }).then(() => {
+                  console.log('users table created');
+                });
+            };
+            exports.down = function(knex, Promise) {
+              return knex.schema.dropTable('users');
+            };
+            
+      section
+        pre
+          code.language-javascript.
+            const bcrypt = require('bcrypt');
+            const generatUser = function genUser(email, password, first, last, role) {
+              const salt = bcrypt.genSaltSync(10);
+              const hash = bcrypt.hashSync(password, salt);
+              const user = {
+                firstName: first,
+                lastName: last,
+                password: hash,
+                email: email,
+                created_at: new Date(),
+                updated_at: new Date()
+              };
+              return user;
+            };
+
+            const kev = generatUser('kevin.isom@gmail.com', 'password', 'Kevin', 'Isom');
+
+            exports.seed = function userSeed(knex, Promise) {
+              return knex('users').insert(kev);
+            };
+      section
+        pre
+          code.language-javascript.
+            knex('users').where('email', 'kevin.isom@gmail.com');
+      section
+        h2 ORM - Bookshelf.js
+      section
+        pre
+          code.language-javascript.
+            module.exports = bookshelf.model('User', {
+              tableName: 'users',
+              idAttribute: 'id'
+            }, {
+              login: function (email, password) {
+                console.log('login', email);
+                return new this({ email: email.toLowerCase().trim() })
+                .fetch({ require: true })
+                .tap(function(user) {
+                  if (bcrypt.compareSync(user.get('password'), password)) {
+                    return false;
+                  }
+                  return user;
+                });
+              }
+            });
+      section
+        h2 Server rendering with ease
+      section
+        h2 How Easy?
+      section
+        pre
+          code.language-javascript.
+            ReactDOMServer.renderToString(App(props));
+      section
+        h2.bullet That easy
+        p But if you need more <a href="https://www.npmjs.com/package/iso">iso</a>
+      section
+        h2 Great, now I have to do something with it
+        h3 Deploying your app
+      section
+        h3 <a href="https://github.com/shipitjs">Shipit JS</a>
+        p Universal automation and deployment tool written in JavaScript.
+      section
+        h3.bullet Covers
+        ul
+          li retrieving from source control
+          li ssh
+          li npm tasks
+          li general command line task
+      section
+        pre
+          code.language-javascript.
+            module.exports = function (shipit) {
+              require('shipit-deploy')(shipit);
+              shipit.initConfig({
+                default: {
+                  workspace: '/tmp/github-monitor',
+                  deployTo: '/tmp/deploy_to',
+                  repositoryUrl: 'https://github.com/user/repo.git',
+                  ignores: ['.git', 'node_modules'],
+                  rsync: ['--del'],
+                  keepReleases: 2,
+                  key: '/path/to/key',
+                  shallowClone: true
+                },
+                staging: {
+                  servers: 'user@myserver.com'
+                }
+              });
+            };
+      section
+        h2 Great, it's on the server now what?
+        h3 The care and feeding of a node server
+      section
+        h2 <a href="http://pm2.keymetrics.io/">PM2</a>
+        p Advanced, production process manager for Node.js
+      section
+        h4 config
+        pre
+          code.language-javascript.
+            {
+              "name"        : "my-awesome-app",
+              "script"      : "bin/www",
+              "args"        : [],
+              "watch"       : true,
+              "node_args"   : ["--production"],
+              "merge_logs"  : true,
+              "cwd"         : "~/myapp/web/current",
+              "env": {
+                 "NODE_ENV": "production",
+                 "env":"production",
+                 "PORT": "7353"
+              }
+            }
+      section
+        h2 Beyond the Web App
+      section
+        h2 Automated Selenium testing with Nightwatch
+      section
+        pre
+          code.language-javascript.
+            module.exports = {
+              "Demo test Google" : function (client) {
+              client
+                .url("http://www.google.com")
+                .waitForElementVisible("body", 1000)
+                .assert.title("Google")
+                .assert.visible("input[type=text]")
+                .setValue("input[type=text]", "rembrandt van rijn")
+                .waitForElementVisible("button[name=btnG]", 1000)
+                .click("button[name=btnG]")
+                .pause(1000)
+                .assert.containsText("ol#rso li:first-child", "Rembrandt - Wikipedia")
+                .end();
+              }
+            };
+      section
+        h2 Mobile API with Parse Server
+      section
+        h2 Mobile App with React-Native
+      section
+        h2 Thanks
+        ul 
+          li <a href="https://www.twitter.com/kev_nz">kev_nz on Twitter</a>
+          li <a href="https://www.github.com/kevnz">kevnz on Github</a>
+
+    script(src='build/build.js')
